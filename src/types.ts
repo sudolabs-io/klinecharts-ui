@@ -27,6 +27,12 @@ export interface SymbolInfo {
   logo?: string
 }
 
+export interface SymbolDetails extends SymbolInfo {
+  logo_url?: string
+  description?: string
+  market_cap?: number
+}
+
 export interface Period {
   multiplier: number
   timespan: string
