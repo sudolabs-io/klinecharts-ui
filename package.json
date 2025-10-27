@@ -26,7 +26,6 @@
   ],
   "author": "liihuu",
   "license": "Apache-2.0",
-  "private": true,
   "scripts": {
     "build-core": "tsc && vite build",
     "build-dts": "dts-bundle-generator --no-banner true --umd-module-name klinechartspro -o dist/index.d.ts src/index.ts",
