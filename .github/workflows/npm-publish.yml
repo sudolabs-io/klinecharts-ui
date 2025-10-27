@@ -22,8 +22,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: https://registry.npmjs.org/
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@sudolabs-io'
       - run: npm install && npm run build
-      - run: npm publish --access=public
+      - run: npm publish --access=restricted
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
