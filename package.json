@@ -6,6 +6,7 @@
   "main": "./dist/klinecharts-pro.umd.js",
   "module": "./dist/klinecharts-pro.js",
   "types": "./dist/index.d.ts",
+  "private": false,
   "files": [
     "LICENSE",
     "README.md",
