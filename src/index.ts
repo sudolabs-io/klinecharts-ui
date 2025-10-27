@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { registerOverlay } from 'klinecharts'
+import { IndicatorSeries, KLineData, registerIndicator, registerOverlay } from 'klinecharts'
 
 import overlays from './extension'
 
@@ -26,6 +26,23 @@ import { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, ChartProOption
 import './index.less'
 
 overlays.forEach(o => { registerOverlay(o) })
+
+registerIndicator({
+  name: 'customIndicatorBasic',
+  shortName: 'Basic',
+  series: IndicatorSeries.Price,
+  figures: [{
+    key: 'close',
+    title: 'close: ',
+    type: 'line'
+  }],
+  calc: (data: KLineData[]) => {
+    return data.map((item) => ({
+      timestamp: item.timestamp,
+      close: item.close + 1
+    }))
+  }
+})
 
 export {
   DefaultDatafeed,

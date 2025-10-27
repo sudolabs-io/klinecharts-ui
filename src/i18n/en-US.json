@@ -1,5 +1,6 @@
 {
   "indicator": "Indicator",
+  "compareIndicator": "Compare",
   "main_indicator": "Main Indicator",
   "sub_indicator": "Sub Indicator",
   "setting": "Setting",

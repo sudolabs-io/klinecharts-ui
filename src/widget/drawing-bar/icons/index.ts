@@ -97,7 +97,8 @@ export const mapping = {
   unlock,
   visible,
   invisible,
-  remove
+  remove,
+  pitchFork: horizontalRayLine
 }
 
 export function createSingleLineOptions (locale: string): SelectDataSourceItem[] {
@@ -112,7 +113,8 @@ export function createSingleLineOptions (locale: string): SelectDataSourceItem[]
     { key: 'rayLine', text: i18n('ray_line', locale) },
     { key: 'segment', text: i18n('segment', locale) },
     { key: 'arrow', text: i18n('arrow', locale) },
-    { key: 'priceLine', text: i18n('price_line', locale) }
+    { key: 'priceLine', text: i18n('price_line', locale) },
+    { key: 'pitchFork', text: 'Pitch Fork' }
   ]
 }
 

@@ -56,6 +56,7 @@ export interface ChartProOptions {
   mainIndicators?: string[]
   subIndicators?: string[]
   datafeed: Datafeed
+  showCompareIndicator?: boolean
 }
 
 export interface ChartPro {

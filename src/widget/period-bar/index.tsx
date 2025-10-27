@@ -24,6 +24,7 @@ export interface PeriodBarProps {
   symbol: SymbolInfo
   period: Period
   periods: Period[]
+  showCompareIndicator: boolean
   onMenuClick: () => void
   onSymbolClick: () => void
   onPeriodChange: (period: Period) => void
@@ -31,6 +32,7 @@ export interface PeriodBarProps {
   onTimezoneClick: () => void
   onSettingClick: () => void
   onScreenshotClick: () => void
+  onCompareIndicatorClick: () => void
 }
 
 const PeriodBar: Component<PeriodBarProps> = props => {
@@ -95,6 +97,14 @@ const PeriodBar: Component<PeriodBarProps> = props => {
         </svg>
         <span>{i18n('indicator', props.locale)}</span>
       </div>
+      <Show when={props.showCompareIndicator}>
+        <div
+          class='item tools'
+          onClick={props.onCompareIndicatorClick}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20h10M6 6l6-1l6 1m-6-3v17m-3-8L6 6l-3 6a3 3 0 0 0 6 0m12 0l-3-6l-3 6a3 3 0 0 0 6 0"/></svg>
+          <span>{i18n('compareIndicator', props.locale)}</span>
+        </div>
+      </Show>
       <div
         class='item tools'
         onClick={props.onTimezoneClick}>

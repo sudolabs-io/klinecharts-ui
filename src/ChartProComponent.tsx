@@ -16,25 +16,33 @@ import { createSignal, createEffect, onMount, Show, onCleanup, startTransition, 
 
 import {
   init, dispose, utils, Nullable, Chart, OverlayMode, Styles,
-  TooltipIconPosition, ActionType, PaneOptions, Indicator, DomPosition, FormatDateType
+  TooltipIconPosition, ActionType, PaneOptions, Indicator, DomPosition, FormatDateType,
+  registerIndicator,
+  IndicatorSeries,
+  KLineData,
+  CandleType,
+  YAxisType,
 } from 'klinecharts'
 
 import lodashSet from 'lodash/set'
 import lodashClone from 'lodash/cloneDeep'
 
-import { SelectDataSourceItem, Loading } from './component'
+import { SelectDataSourceItem, Loading, Button } from './component'
 
 import {
   PeriodBar, DrawingBar, IndicatorModal, TimezoneModal, SettingModal,
-  ScreenshotModal, IndicatorSettingModal, SymbolSearchModal
+  ScreenshotModal, IndicatorSettingModal, SymbolSearchModal,
+  ControlsBar,
+  CPeriodBar
 } from './widget'
 
 import { translateTimezone } from './widget/timezone-modal/data'
 
-import { SymbolInfo, Period, ChartProOptions, ChartPro } from './types'
+import { SymbolInfo, Period, ChartProOptions, ChartPro, Datafeed } from './types'
 
 export interface ChartProComponentProps extends Required<Omit<ChartProOptions, 'container'>> {
   ref: (chart: ChartPro) => void
+  showCompareIndicator: boolean
 }
 
 interface PrevSymbolPeriod {
@@ -65,6 +73,35 @@ function createIndicator (widget: Nullable<Chart>, indicatorName: string, isStac
   }, isStack, paneOptions) ?? null
 }
 
+// Sudo Edit: Compare to other symbols - Logic
+
+function registerAndCreateCompareIndicator(widget: Nullable<Chart>, symbol: SymbolInfo, dataFeed: Datafeed, period: Period) {
+  registerIndicator({
+    name: 'compareIndicator',
+    shortName: 'COMPARE',
+    series: IndicatorSeries.Price,
+    figures: [
+      {
+        key: 'close',
+        title: `${symbol.ticker}: `,
+        type: 'line',
+        styles: (data, indicator, defaultStyles) => {
+          return {
+            style: 'line',
+            color: 'purple'
+          }
+        }
+      },
+    ],
+    calc: async (data: KLineData[]) => {
+      const symbolData = await dataFeed.getHistoryKLineData(symbol, period, data[0].timestamp, data[data.length - 1].timestamp)
+      return symbolData
+    }
+  })
+  
+  widget?.createIndicator('compareIndicator', false, { id: 'candle_pane' })
+}
+
 const ChartProComponent: Component<ChartProComponentProps> = props => {
   let widgetRef: HTMLDivElement | undefined = undefined
   let widget: Nullable<Chart> = null
@@ -72,6 +109,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   let priceUnitDom: HTMLElement
 
   let loading = false
+
 
   const [theme, setTheme] = createSignal(props.theme)
   const [styles, setStyles] = createSignal(props.styles)
@@ -100,6 +138,12 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   const [indicatorSettingModalParams, setIndicatorSettingModalParams] = createSignal({
     visible: false, indicatorName: '', paneId: '', calcParams: [] as Array<any>
   })
+
+  // Sudo Edit: Compare to other symbols - Signals
+  const [compareSymbolSearchModalVisible, setCompareSymbolSearchModalVisible] = createSignal(false)
+
+  const [candleType, setCandleType] = createSignal(CandleType.CandleSolid)
+  const [axisType, setAxisType] = createSignal(YAxisType.Normal)
 
   props.ref({
     setTheme,
@@ -439,7 +483,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
   })
 
   return (
-    <>
+    <div>
       <i class="icon-close klinecharts-pro-load-icon"/>
       <Show when={symbolSearchModalVisible()}>
         <SymbolSearchModal
@@ -447,6 +491,13 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           datafeed={props.datafeed}
           onSymbolSelected={symbol => { setSymbol(symbol) }}
           onClose={() => { setSymbolSearchModalVisible(false) }}/>
+      </Show>
+      <Show when={compareSymbolSearchModalVisible()}>
+        <SymbolSearchModal
+          locale={props.locale}
+          datafeed={props.datafeed}
+          onSymbolSelected={symbol => { registerAndCreateCompareIndicator(widget, symbol, props.datafeed, period()) }}
+          onClose={() => { setCompareSymbolSearchModalVisible(false) }}/>
       </Show>
       <Show when={indicatorModalVisible()}>
         <IndicatorModal
@@ -497,7 +548,14 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           currentStyles={utils.clone(widget!.getStyles())}
           onClose={() => { setSettingModalVisible(false) }}
           onChange={style => {
+            console.log('style', style)
             widget?.setStyles(style)
+            if (style.candle?.type) {
+              setCandleType(style.candle.type)
+            }
+            if (style.yAxis?.type) {
+              setAxisType(style.yAxis.type)
+            }
           }}
           onRestoreDefault={(options: SelectDataSourceItem[]) => {
             const style = {}
@@ -506,6 +564,8 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
               lodashSet(style, key, utils.formatValue(widgetDefaultStyles(), key))
             })
             widget?.setStyles(style)
+            setCandleType(CandleType.CandleSolid)
+            setAxisType(YAxisType.Normal)
           }}
         />
       </Show>
@@ -527,12 +587,19 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           }}
         />
       </Show>
-      <PeriodBar
+      <CPeriodBar
         locale={props.locale}
+        showQuickChartSettings={true}
+        allowSymbolSearch={false}
         symbol={symbol()}
         spread={drawingBarVisible()}
         period={period()}
+        chartCandleType={candleType()}
+        chartAxisType={axisType()}
         periods={props.periods}
+        showCompareIndicator={props.showCompareIndicator}
+        onChangeAxisType={axisType => { widget?.setStyles({ yAxis: { type: axisType } }); setAxisType(axisType) }}
+        onChangeCandleType={candleType => { widget?.setStyles({ candle: { type: candleType } }); setCandleType(candleType) }}
         onMenuClick={async () => {
           try {
             await startTransition(() => setDrawingBarVisible(!drawingBarVisible()))
@@ -550,6 +617,7 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
             setScreenshotUrl(url)
           }
         }}
+        onCompareIndicatorClick={() => { setCompareSymbolSearchModalVisible(true) }}
       />
       <div
         class="klinecharts-pro-content">
@@ -570,7 +638,12 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           class='klinecharts-pro-widget'
           data-drawing-bar-visible={drawingBarVisible()}/>
       </div>
-    </>
+      {/* <ControlsBar
+        onChangeCandleType={candleType => { widget?.setStyles({ candle: { type: candleType } }) }}
+        isDrawingBarVisible={drawingBarVisible()}
+        widget={widget}
+      /> */}
+    </div>
   )
 }
 

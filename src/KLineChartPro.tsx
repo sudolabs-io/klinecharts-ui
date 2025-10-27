@@ -51,14 +51,15 @@ export default class KLineChartPro implements ChartPro {
           locale={options.locale ?? 'zh-CN'}
           drawingBarVisible={options.drawingBarVisible ?? true}
           symbol={options.symbol}
-          period={options.period}
+          period={{ multiplier: 1, timespan: 'day', text: 'D' }}
+          showCompareIndicator={options.showCompareIndicator ?? true}
           periods={
             options.periods ?? [
-              { multiplier: 1, timespan: 'minute', text: '1m' },
-              { multiplier: 5, timespan: 'minute', text: '5m' },
-              { multiplier: 15, timespan: 'minute', text: '15m' },
+              // { multiplier: 1, timespan: 'minute', text: '1m' },
+              // { multiplier: 5, timespan: 'minute', text: '5m' },
+              // { multiplier: 15, timespan: 'minute', text: '15m' },
               { multiplier: 1, timespan: 'hour', text: '1H' },
-              { multiplier: 2, timespan: 'hour', text: '2H' },
+              // { multiplier: 2, timespan: 'hour', text: '2H' },
               { multiplier: 4, timespan: 'hour', text: '4H' },
               { multiplier: 1, timespan: 'day', text: 'D' },
               { multiplier: 1, timespan: 'week', text: 'W' },

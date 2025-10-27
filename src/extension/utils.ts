@@ -12,12 +12,34 @@
  * limitations under the License.
  */
 
-import { Coordinate, Bounding, LineAttrs, utils } from 'klinecharts'
+import { Coordinate, Bounding, LineAttrs, utils, Nullable } from 'klinecharts'
 
 export function getRotateCoordinate (coordinate: Coordinate, targetCoordinate: Coordinate, angle: number): Coordinate {
   const x = (coordinate.x - targetCoordinate.x) * Math.cos(angle) - (coordinate.y - targetCoordinate.y) * Math.sin(angle) + targetCoordinate.x
   const y = (coordinate.x - targetCoordinate.x) * Math.sin(angle) + (coordinate.y - targetCoordinate.y) * Math.cos(angle) + targetCoordinate.y
   return { x, y }
+}
+
+export function getLinearSlopeIntercept (coordinate1: Coordinate, coordinate2: Coordinate): Nullable<number[]> {
+  const difX = coordinate1.x - coordinate2.x
+  if (difX !== 0) {
+    const k = (coordinate1.y - coordinate2.y) / difX
+    const b = coordinate1.y - k * coordinate1.x
+    return [k, b]
+  }
+  return null
+}
+
+export function getLinearYFromSlopeIntercept (kb: Nullable<number[]>, coordinate: Coordinate): number {
+  if (kb !== null) {
+    return coordinate.x * kb[0] + kb[1]
+  }
+  return coordinate.y
+}
+
+export function getLinearYFromCoordinates (coordinate1: Coordinate, coordinate2: Coordinate, targetCoordinate: Coordinate): number {
+  const kb = getLinearSlopeIntercept(coordinate1, coordinate2)
+  return getLinearYFromSlopeIntercept(kb, targetCoordinate)
 }
 
 export function getRayLine (coordinates: Coordinate[], bounding: Bounding): LineAttrs | LineAttrs[] {
