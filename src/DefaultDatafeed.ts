@@ -14,7 +14,7 @@
 
 import { KLineData } from 'klinecharts'
 
-import { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, SymbolDetails } from './types'
+import { Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, SymbolDetails, SymbolSnapshot } from './types'
 
 
 export default class DefaultDatafeed implements Datafeed {
@@ -59,6 +59,13 @@ export default class DefaultDatafeed implements Datafeed {
       description: result.results.description,
       market_cap: result.results.market_cap,
     }
+  }
+
+  async getSymbolSnapshot (symbol: string): Promise<SymbolSnapshot> {
+    const response = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${symbol}?apiKey=${this._apiKey}`)
+    const result = await response.json()
+
+    return result.ticker
   }
 
   async getHistoryKLineData (symbol: SymbolInfo, period: Period, from: number, to: number): Promise<KLineData[]> {

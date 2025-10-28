@@ -33,6 +33,53 @@ export interface SymbolDetails extends SymbolInfo {
   market_cap?: number
 }
 
+export interface SymbolSnapshot {
+  day: {
+    c: number
+    h: number
+    l: number
+    o: number
+    v: number
+    vw: number
+  },
+  lastQuote: {
+    P: number
+    S: number
+    p: number
+    s: number
+    t: number
+  },
+  lastTrade: {
+    c: [number, number],
+    p: number,
+    s: number,
+    t: number,
+    x: number,
+  },
+  min: {
+    av: number,
+    c: number,
+    h: number,
+    l: number,
+    n: number,
+    o: number,
+    t: number,
+    v: number,
+    vw: number
+  },
+  prevDay: {
+    c: number,
+    h: number,
+    l: number,
+    o: number,
+    v: number,
+    vw: number
+  },
+  ticker: string
+  todaysChange: number
+  todaysChangePerc: number
+}
+
 export interface Period {
   multiplier: number
   timespan: string
