@@ -14,10 +14,12 @@
 
 import zhCN from './zh-CN.json'
 import enUS from './en-US.json'
+import czCZ from './cz-CZ.json'
 
 const locales = {
   'zh-CN': zhCN,
-  'en-US': enUS
+  'en-US': enUS,
+  'cz-CZ': czCZ,
 }
 
 export function load (key: string, ls: any) {

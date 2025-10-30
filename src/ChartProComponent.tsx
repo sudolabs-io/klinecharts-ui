@@ -160,7 +160,14 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     getPeriod: () => period()
   })
 
-  const documentResize = () => {
+  const documentResize = (e: UIEvent) => {
+    // @ts-expect-error
+    const width = e.target.innerWidth
+    if (width <= 768) {
+      setDrawingBarVisible(false)
+    } else {
+      setDrawingBarVisible(true)
+    }
     widget?.resize()
   }
 
@@ -482,6 +489,16 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
     }
   })
 
+  createEffect(() => {
+    if (document) {
+      if (document.body.clientWidth <= 768) {
+        setDrawingBarVisible(false)
+      } else {
+        setDrawingBarVisible(true)
+      }
+    }
+  })
+
   return (
     <div>
       <i class="icon-close klinecharts-pro-load-icon"/>
@@ -490,14 +507,17 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           locale={props.locale}
           datafeed={props.datafeed}
           onSymbolSelected={symbol => { setSymbol(symbol) }}
-          onClose={() => { setSymbolSearchModalVisible(false) }}/>
+          onClose={() => { setSymbolSearchModalVisible(false) }}
+          currentSymbol={symbol() as SymbolInfo}
+          />
       </Show>
       <Show when={compareSymbolSearchModalVisible()}>
         <SymbolSearchModal
           locale={props.locale}
           datafeed={props.datafeed}
           onSymbolSelected={symbol => { registerAndCreateCompareIndicator(widget, symbol, props.datafeed, period()) }}
-          onClose={() => { setCompareSymbolSearchModalVisible(false) }}/>
+          onClose={() => { setCompareSymbolSearchModalVisible(false) }}
+          currentSymbol={symbol() as SymbolInfo}/>
       </Show>
       <Show when={indicatorModalVisible()}>
         <IndicatorModal
@@ -638,11 +658,6 @@ const ChartProComponent: Component<ChartProComponentProps> = props => {
           class='klinecharts-pro-widget'
           data-drawing-bar-visible={drawingBarVisible()}/>
       </div>
-      {/* <ControlsBar
-        onChangeCandleType={candleType => { widget?.setStyles({ candle: { type: candleType } }) }}
-        isDrawingBarVisible={drawingBarVisible()}
-        widget={widget}
-      /> */}
     </div>
   )
 }

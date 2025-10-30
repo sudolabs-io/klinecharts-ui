@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Component, createSignal, createResource, Show } from 'solid-js'
+import { Component, createSignal, createResource, Show, createEffect } from 'solid-js'
 
 import { Modal, List, Input } from '../../component'
 
@@ -24,13 +24,22 @@ export interface SymbolSearchModalProps {
   locale: string
   datafeed: Datafeed
   onSymbolSelected: (symbol: SymbolInfo) => void
-  onClose: () => void
+  onClose: () => void,
+  currentSymbol: SymbolInfo
 }
 
 const SymbolSearchModal: Component<SymbolSearchModalProps> = props => {
   const [value, setValue] = createSignal('')
 
-  const [symbolList] = createResource(value, props.datafeed.searchSymbols.bind(props.datafeed))
+  const [symbolList, mutateSymbolList] = createResource(value, props.datafeed.searchSymbols.bind(props.datafeed))
+
+  // filter current symbol from symbol list
+  createEffect(() => {
+    if (props.currentSymbol) {
+      mutateSymbolList.mutate(symbolList()?.filter(symbol => symbol.ticker !== props.currentSymbol.ticker))
+    }
+  })
+
 
   return (
     <Modal

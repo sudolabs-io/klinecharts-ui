@@ -9,6 +9,16 @@
   box-sizing: border-box;
   border-bottom: solid 1px var(--klinecharts-pro-border-color);
   justify-content: space-between;
+
+
+  .hidden-on-mobile {
+    display: block;
+    
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+  
   .menu-container {
     display: flex;
     height: 100%;
@@ -67,6 +77,10 @@
       padding: 0 12px;
       border-right: solid 1px var(--klinecharts-pro-border-color);
 
+      @media (max-width: 768px) {
+        padding: 0 4px;
+      }
+
       button {
         padding: 4px 8px;
         border-radius: 2px;
@@ -109,6 +123,11 @@
     &:first-child {
       margin-left: 8px;
     }
+
+    @media (max-width: 768px) {
+      padding: 2px 2px;
+      margin: 0 2px;
+    }
   }
   .symbol + .period, .menu-container + .period {
     margin-left: 12px;
@@ -122,6 +141,11 @@
     height: 100%;
     padding: 0 12px;
     border-right: solid 1px var(--klinecharts-pro-border-color);
+
+    @media (max-width: 768px) {
+      padding: 0 4px;
+    }
+
     &:hover {
       fill: var(--klinecharts-pro-primary-color);
       color: var(--klinecharts-pro-primary-color);

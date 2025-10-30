@@ -44,7 +44,7 @@ import eightWaves from './eightWaves'
 import anyWaves from './anyWaves'
 import abcd from './abcd'
 import xabcd from './xabcd'
-
+import pitchFork from './pitchFork'
 import weakMagnet from './weakMagnet'
 import strongMagnet from './strongMagnet'
 
@@ -98,7 +98,7 @@ export const mapping = {
   visible,
   invisible,
   remove,
-  pitchFork: horizontalRayLine
+  pitchFork,
 }
 
 export function createSingleLineOptions (locale: string): SelectDataSourceItem[] {
